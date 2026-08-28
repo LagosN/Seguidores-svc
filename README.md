@@ -63,3 +63,14 @@ docker compose up --build
 mvn test      # unit tests + Cucumber
 mvn verify    # + verificación de cobertura JaCoCo (100% LINE, falla si baja)
 ```
+## Modelo de ramificacion y estructura
+Modelo elegido: GitFlow
+
+Elegimos GitFlow porque nos permite organizar el proyecto durante el semestre y mantener separadas las versiones estables de las que están en desarrollo.
+
+| Rama       | Uso                                                   |
+| ---------- | ----------------------------------------------------- |
+| main     | Contiene las versiones estables y entregables.        |
+| develop  | Integra los cambios antes de pasarlos a main.       |
+| feature/ | Para desarrollar nuevas funcionalidades.              |
+| hotfix/  | Para corregir errores urgentes sin afectar develop. |
