@@ -1,0 +1,27 @@
+@startuml C4-2-Contenedores
+!include <C4/C4_Container>
+
+title ms-seguidores — C4 Nivel 2: Contenedores
+
+LAYOUT_WITH_LEGEND()
+
+Person(actor, "Usuario / Creador", "Publica, sigue y conversa")
+System_Boundary(sb, "ms-seguidores (dominio de Seguidores)") {
+  Container(api, "API de Seguidores", "Spring Boot 3 · Java 21 · ECS Fargate", "Expone /api/seguimientos y persiste el dominio con su propia base de datos")
+  ContainerDb(db, "BD de Seguidores", "Aurora Serverless (PostgreSQL)", "Seguimientos del dominio (propia del servicio)")
+  ContainerQueue(q, "Cola de eventos", "Amazon SQS + DLQ", "Eventos del dominio persistidos antes de avanzar")
+}
+
+Container(apigw, "API Gateway", "Amazon API Gateway", "JWT + throttling")
+Container(core, "ms-contenido", "Spring Boot 3", "Servicio central del caso: colabora en la operación")
+Container(ev, "Amazon EventBridge", "Servicio AWS", "Eventos del dominio hacia notificaciones y analítica")
+
+Rel(actor, apigw, "Usa la API", "HTTPS + JWT")
+Rel(apigw, api, "Enruta /api/seguimientos", "REST")
+Rel(api, db, "Persiste la operación", "JPA / SQL (TLS)")
+Rel(api, q, "Publica el evento de dominio", "AWS SDK")
+Rel(q, ev, "Entrega el evento", "AWS SDK")
+Rel_Back(core, api, "Colabora en la operación", "REST")
+
+SHOW_LEGEND()
+@enduml

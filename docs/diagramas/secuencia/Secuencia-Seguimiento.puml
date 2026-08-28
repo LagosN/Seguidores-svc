@@ -1,0 +1,44 @@
+@startuml Secuencia-Seguimiento
+title ms-seguidores — Diagrama de secuencia: ciclo de vida de la operación
+
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 320
+skinparam sequenceMessageAlignment center
+skinparam roundCorner 8
+autonumber "<b>0."
+
+participant "App Cliente" as app #D5E8D4
+participant "API Gateway" as gw #DAE8FC
+box "ms-seguidores" #FFF2CC
+  participant "SeguimientoController" as rest
+  participant "SeguimientoService" as svc
+  participant "VecinoClient (CB)" as cli
+  participant "Repository" as repo
+  participant "PublicadorEventos" as pub
+end box
+participant "Servicio vecino" as vecino #E1D5E7
+participant "SQS" as sqs #F8CECC
+participant "Notificaciones" as notif #E1D5E7
+
+== Creación de la operación ==
+app -> gw : POST /api/seguimientos (JWT)
+gw -> rest : valida JWT y enruta
+rest -> svc : crear(seguimiento)
+svc -> cli : valida datos con el vecino
+cli -> vecino : GET (Circuit Breaker cerrado)
+vecino --> cli : 200 OK
+svc -> repo : persiste la operación (transacción)
+rest --> app : 201 Created
+
+== Desacople por evento ==
+svc -> pub : publica el evento de dominio
+pub -> sqs : send (persistido)
+sqs ->> notif : entrega asíncrona
+note over repo, sqs
+  <b>Integridad ante fallas (RNF del caso)</b>
+  La operación se persiste ANTES de responder;
+  el evento sale por SQS con DLQ: si un consumidor
+  falla, nada se pierde.
+end note
+
+@enduml

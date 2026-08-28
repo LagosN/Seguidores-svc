@@ -1,0 +1,8 @@
+services:
+  seguidores-svc:
+    build: .
+    image: duoc/jv0101-caso12-seguidores:1.0.0
+    container_name: caso12-seguidores-svc
+    ports:
+      - "${PORT:-8080}:8080"
+    restart: unless-stopped

@@ -1,0 +1,28 @@
+@startuml C4-3-Componentes
+!include <C4/C4_Component>
+
+title ms-seguidores — C4 Nivel 3: Componentes internos
+
+LAYOUT_WITH_LEGEND()
+
+Person(actor, "Usuario / Creador", "Publica, sigue y conversa")
+Container_Boundary(ms, "ms-seguidores — Spring Boot 3 (ECS Fargate)") {
+
+  Component(rest, "SeguimientoController", "Spring MVC REST", "Expone /api/seguimientos: crear, consultar, actualizar y eliminar")
+  Component(svc, "SeguimientoService", "Java 21", "Lógica de negocio del dominio: validaciones, reglas y transiciones")
+  Component(cli, "VecinoClient", "RestClient + Resilience4j", "Llama a servicios vecinos con Circuit Breaker")
+  ComponentDb(repo, "SeguimientoRepository", "Spring Data JPA", "Persistencia en la base de datos propia")
+  Component(pub, "PublicadorEventos", "AWS SDK (SQS)", "Publica el evento de dominio persistido")
+}
+
+Container(apigw, "API Gateway", "Amazon API Gateway", "JWT + throttling")
+
+Rel(actor, apigw, "Usa la API", "HTTPS + JWT")
+Rel(apigw, rest, "Enruta /api/seguimientos", "REST")
+Rel(rest, svc, "Delega el caso de uso")
+Rel(svc, cli, "Valida con el vecino", "REST (Circuit Breaker)")
+Rel(svc, repo, "Persiste la operación", "JPA / SQL")
+Rel(svc, pub, "Publica el evento", "AWS SDK")
+
+SHOW_LEGEND()
+@enduml
