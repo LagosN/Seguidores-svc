@@ -74,3 +74,14 @@ Elegimos GitFlow porque nos permite organizar el proyecto durante el semestre y 
 | develop  | Integra los cambios antes de pasarlos a main.       |
 | feature/ | Para desarrollar nuevas funcionalidades.              |
 | hotfix/  | Para corregir errores urgentes sin afectar develop. |
+
+### Historial de Commits y Orden Cronológico
+
+| N° | Rama | Evento / Destino | Commit |
+| :-: | :--- | :--- | :--- |
+| 1 | main | Base inicial | feat: version inicial del microservicio seguidores |
+| 2 | main | Documentación | docs: documentar modelo de ramificacion GitFlow y su justificacion |
+| 3 | feature/pagina-presentacion | Pull Request $\rightarrow$ develop | feat(ui): agregar pie de pagina con version del servicio |
+| 4 | feature/changelog | Pull Request $\rightarrow$ develop | docs: agregar changelog del microservicio seguidores |
+| 5 | hotfix/titulo-pagina | Pull Request $\rightarrow$ main (y merge a develop) | fix(ui): corregir titulo de la pagina principal |
+| 6 | develop | CI / Integration | chore(ci): agregar workflow hola mundo (IE3/IE4) |
